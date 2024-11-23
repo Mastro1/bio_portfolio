@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Welcome to Bio Portfolio</h1>
+    <p class="text-muted text-center">Analyze the biodiversity impact of financial portfolios.</p>
+
+    <!-- Search Bar -->
+    <form action="/" method="POST" class="my-4">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for a company..." name="query">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+
+    <!-- Top and Worst Companies Section -->
+    <div class="row mt-5">
+        <!-- Top Companies -->
+        <div class="col-md-6">
+            <h3 class="text-center">Top Companies</h3>
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Company Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in top_companies %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><a href="/company/{{ company.instrumentid }}">{{ company.name }}</a></td>
+                        <td>{{ "%.2f" | format(company.score) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Worst Companies -->
+        <div class="col-md-6">
+            <h3 class="text-center">Worst Companies</h3>
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Company Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in worst_companies %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><a href="/company/{{ company.instrumentid }}">{{ company.name }}</a></td>
+                        <td>{{ "%.2f" | format(company.score) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

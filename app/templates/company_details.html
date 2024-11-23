@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company_name }} Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">{{ company_name }}</h1>
+
+    <!-- Top Section: Description and Score -->
+    <div class="row mt-4">
+        <!-- Description Box -->
+        <div class="col-md-6">
+            <h3>Company description</h3>
+            <p class="justify-text">{{ description }}</p>
+        </div>
+
+        <!-- Score and Endpoints -->
+        <div class="col-md-6 text-center">
+            <h3>Biodiversity Index Score</h3>
+            <div id="score-container" style="width: 200px; height: 200px; margin: 0 auto;"></div>
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for endpoint, value in endpoints.items() %}
+                    <tr>
+                        <td>Demage to {{ endpoint }} ecosystem</td>
+                        <td>{{ "%.2f" | format(value) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Midpoints Graph -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3 class="text-center">Midpoints Graph</h3>
+            <div id="midpoints-graph" style="width: 100%; height: 500px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Include ProgressBar.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/progressbar.js/1.0.1/progressbar.min.js"></script>
+
+<!-- Include Plotly for Radar Chart -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script>
+    // Render Score Circle using ProgressBar.js
+    const score = {{ positive_score }};
+    const scoreColor = "{{ score_color }}";
+
+    const bar = new ProgressBar.Circle('#score-container', {
+        strokeWidth: 10,
+        duration: 2400,
+        color: scoreColor,
+        trailColor: '#eee',
+        trailWidth: 8,
+        easing: 'easeInOut',
+        text: {
+            value: '',
+            style: {
+                color: '#000',
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                padding: 0,
+                margin: 0,
+                transform: 'translate(-50%, -50%)',
+                fontSize: '24px',
+                fontWeight: 'bold',
+            },
+        },
+    });
+
+    bar.animate(score / 100); // Animate the circle to the score percentage
+    bar.setText(`${Math.round(score)}`);
+
+    // Render Radar Chart
+    const radarData = JSON.parse('{{ radar_data | safe }}');
+    const radarChart = [{
+        type: 'scatterpolar',
+        r: radarData.values,
+        theta: radarData.categories,
+        fill: 'toself',
+        name: 'Midpoints',
+        marker: { color: '#007bff' },
+    }];
+
+    const radarLayout = {
+        polar: {
+            radialaxis: {
+                visible: true,
+                range: [0, Math.max(...radarData.values) * 1.2]
+            }
+        },
+        showlegend: false
+    };
+
+    Plotly.newPlot('midpoints-graph', radarChart, radarLayout);
+</script>
+{% endblock %}
